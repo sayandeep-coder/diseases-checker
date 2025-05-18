@@ -1,261 +1,337 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Skin Disease Classifier</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f5f5f5;
-      color: #333;
-    }
-    h1 {
-      color: #2c3e50;
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .container {
-      background-color: white;
-      border-radius: 10px;
-      padding: 30px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .upload-area {
-      border: 2px dashed #3498db;
-      border-radius: 8px;
-      padding: 30px;
-      text-align: center;
-      margin-bottom: 20px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .upload-area:hover {
-      background-color: #f0f8ff;
-      border-color: #2980b9;
-    }
-    .upload-area.active {
-      border-color: #27ae60;
-      background-color: #e8f5e9;
-    }
-    #imagePreview {
-      max-width: 100%;
-      max-height: 300px;
-      margin: 20px auto;
-      display: none;
-      border-radius: 5px;
-    }
-    button {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
-      display: block;
-      margin: 20px auto;
-      width: 200px;
-    }
-    button:hover {
-      background-color: #2980b9;
-    }
-    button:disabled {
-      background-color: #95a5a6;
-      cursor: not-allowed;
-    }
-    .result {
-      margin-top: 30px;
-      padding: 20px;
-      border-radius: 5px;
-      background-color: #f8f9fa;
-      display: none;
-    }
-    .disease-name {
-      font-size: 24px;
-      font-weight: bold;
-      color: #2c3e50;
-      margin-bottom: 10px;
-    }
-    .confidence {
-      font-size: 18px;
-      color: #7f8c8d;
-    }
-    .loading {
-      text-align: center;
-      margin: 20px 0;
-      display: none;
-    }
-    .spinner {
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid #3498db;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .new-analysis {
-      text-align: center;
-      margin-top: 20px;
-    }
-    .new-analysis a {
-      color: #3498db;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .new-analysis a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Disease Classifier | Haldia Institute of Technology</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .institute-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .institute-sub {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .problem-definition {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .problem-definition h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .problem-definition ul {
+            margin-left: 1.5rem;
+        }
+
+        .problem-definition li {
+            margin-bottom: 0.8rem;
+        }
+
+        .classifier-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .classifier-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background-color: #f0f8ff;
+        }
+
+        .upload-area p {
+            margin-bottom: 1rem;
+            color: #7f8c8d;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .preview-container {
+            margin: 1.5rem 0;
+            display: none;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-container {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-container h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .disease-info {
+            text-align: left;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .disease-info h4 {
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+
+        .loading {
+            display: none;
+            margin: 1rem 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #2c3e50;
+            color: white;
+            margin-top: 2rem;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Skin Disease Classifier</h1>
+    <header>
+        <div class="institute-name">Haldia Institute of Technology</div>
+        <div class="institute-sub">(An Autonomous Institute)</div>
+    </header>
 
-    <div class="upload-area" id="uploadArea">
-      <p>Drag & drop an image of skin condition here or click to select</p>
-      <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    <div class="container">
+        <section class="problem-definition">
+            <h2>Problem Definition</h2>
+            <ul>
+                <li><strong>Automated Diagnosis Challenge:</strong> Accurate classification of skin diseases is challenging due to diverse symptoms, overlapping visual patterns, and varying skin tones. Traditional methods rely heavily on dermatologists, making diagnosis time-intensive and prone to subjective interpretation.</li>
+                <li><strong>Need for Classification Models:</strong> Effective models must handle diverse skin types, varying disease presentations, and limited labeled datasets to classify skin diseases accurately and assist healthcare professionals.</li>
+            </ul>
+        </section>
+
+        <section class="classifier-section">
+            <h2>Skin Disease Classifier</h2>
+            
+            <div class="upload-area" id="uploadArea">
+                <p>Upload an image of skin condition for analysis</p>
+                <button class="upload-btn">Choose File</button>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            
+            <div class="preview-container" id="previewContainer">
+                <img id="imagePreview" alt="Preview of uploaded image">
+            </div>
+            
+            <div class="loading" id="loadingIndicator">
+                <div class="spinner"></div>
+                <p>Analyzing image...</p>
+            </div>
+            
+            <div class="result-container" id="resultContainer">
+                <h3>Analysis Result</h3>
+                <div id="resultText"></div>
+                <div class="disease-info" id="diseaseInfo"></div>
+            </div>
+        </section>
     </div>
 
-    <img id="imagePreview" alt="Preview of uploaded image">
+    <footer>
+        <p>Skin Disease Classification Project | Haldia Institute of Technology</p>
+    </footer>
 
-    <button id="analyzeBtn" disabled>Analyze Image</button>
+    <script>
+        // DOM elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultText = document.getElementById('resultText');
+        const diseaseInfo = document.getElementById('diseaseInfo');
+        const loadingIndicator = document.getElementById('loadingIndicator');
 
-    <div class="loading" id="loadingIndicator">
-      <div class="spinner"></div>
-      <p>Analyzing image...</p>
-    </div>
+        // Sample disease database (in a real app, this would come from your model)
+        const diseaseDatabase = {
+            'eczema': {
+                name: 'Eczema',
+                description: 'Eczema is a condition that makes your skin red and itchy. Common in children but can occur at any age. Symptoms include dry, sensitive skin; intense itching; red, inflamed skin; recurring rash; scaly areas; rough, leathery patches; oozing or crusting; areas of swelling.',
+                treatment: 'Treatment focuses on healing damaged skin and alleviating symptoms. This may include moisturizers, corticosteroid creams, oral medications for itching, and avoiding triggers.'
+            },
+            'melanoma': {
+                name: 'Melanoma',
+                description: 'Melanoma is the most serious type of skin cancer that develops in the cells that produce melanin. Warning signs include a new spot on the skin or a spot that is changing in size, shape, or color. The ABCDE rule can help identify melanoma (Asymmetry, Border irregularity, Color that is not uniform, Diameter greater than 6mm, Evolving size or shape).',
+                treatment: 'Treatment depends on the stage and may include surgery to remove the melanoma, chemotherapy, radiation therapy, biological therapy, or targeted therapy. Early detection is crucial.'
+            },
+            'atopic-dermatitis': {
+                name: 'Atopic Dermatitis',
+                description: 'Atopic dermatitis (eczema) is a condition that makes skin red and itchy. It\'s common in children but can occur at any age. It tends to flare periodically and may be accompanied by asthma or hay fever. Symptoms include dry skin, itching (which may be severe), red to brownish-gray patches, small raised bumps that may leak fluid when scratched, thickened skin.',
+                treatment: 'Treatment includes moisturizing regularly, using medicated creams or ointments to control itching and inflammation, avoiding scratching, and identifying and avoiding triggers that worsen the condition.'
+            },
+            'basal-cell-carcinoma': {
+                name: 'Basal Cell Carcinoma',
+                description: 'Basal cell carcinoma is a type of skin cancer that begins in the basal cells. It often appears as a slightly transparent bump on the skin, though it can take other forms. It occurs most often on areas of the skin that are exposed to the sun. Signs include a pearly white or waxy bump, a flat, flesh-colored or brown scar-like lesion, or a bleeding or scabbing sore that heals and returns.',
+                treatment: 'Treatment options include surgical removal, freezing cancer cells, topical treatments, radiation therapy, or photodynamic therapy. Early treatment is important to prevent extensive damage to surrounding tissue.'
+            }
+        };
 
-    <div class="result" id="resultContainer">
-      <div class="disease-name" id="diseaseName"></div>
-      <div class="confidence" id="confidenceLevel"></div>
-      <div class="new-analysis">
-        <a href="#" id="newAnalysisLink">Analyze another image</a>
-      </div>
-    </div>
-  </div>
+        // Event listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = (event) => {
+                    imagePreview.src = event.target.result;
+                    previewContainer.style.display = 'block';
+                    resultContainer.style.display = 'none';
+                    
+                    // Show loading indicator
+                    loadingIndicator.style.display = 'block';
+                    
+                    // Simulate analysis (in a real app, this would call your TensorFlow model)
+                    setTimeout(() => {
+                        analyzeImage();
+                        loadingIndicator.style.display = 'none';
+                    }, 2000);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
 
-  <script>
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInput = document.getElementById('fileInput');
-    const imagePreview = document.getElementById('imagePreview');
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    const resultContainer = document.getElementById('resultContainer');
-    const diseaseName = document.getElementById('diseaseName');
-    const confidenceLevel = document.getElementById('confidenceLevel');
-    const newAnalysisLink = document.getElementById('newAnalysisLink');
+        // Function to analyze the image (simulated)
+        function analyzeImage() {
+            // In a real implementation, you would:
+            // 1. Load your TensorFlow model
+            // 2. Preprocess the image
+            // 3. Run the model prediction
+            // 4. Display the results
+            
+            // For this demo, we'll simulate a random result
+            const diseases = Object.keys(diseaseDatabase);
+            const randomDisease = diseases[Math.floor(Math.random() * diseases.length)];
+            const disease = diseaseDatabase[randomDisease];
+            
+            resultText.innerHTML = ⁠ <p>The image appears to show <strong>${disease.name}</strong> with 85% confidence.</p> ⁠;
+            
+            diseaseInfo.innerHTML = `
+                <h4>About ${disease.name}</h4>
+                <p>${disease.description}</p>
+                <h4>Treatment</h4>
+                <p>${disease.treatment}</p>
+                <p><em>Note: This is for informational purposes only. Please consult a healthcare professional for proper diagnosis and treatment.</em></p>
+            `;
+            
+            resultContainer.style.display = 'block';
+        }
 
-    let model;
-    let uploadedImage;
-
-    const diseases = [
-      "Eczema", "Melanoma", "Atopic Dermatitis",
-      "Basal Cell Carcinoma", "Psoriasis",
-      "Acne", "Rosacea", "Contact Dermatitis"
-    ];
-
-    uploadArea.addEventListener('click', () => fileInput.click());
-    uploadArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadArea.classList.add('active');
-    });
-    uploadArea.addEventListener('dragleave', () => {
-      uploadArea.classList.remove('active');
-    });
-    uploadArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      uploadArea.classList.remove('active');
-      if (e.dataTransfer.files.length) {
-        fileInput.files = e.dataTransfer.files;
-        handleFileSelect(e.dataTransfer.files[0]);
-      }
-    });
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files.length) {
-        handleFileSelect(fileInput.files[0]);
-      }
-    });
-    analyzeBtn.addEventListener('click', analyzeImage);
-    newAnalysisLink.addEventListener('click', () => {
-      location.reload();
-    });
-
-    async function loadModel() {
-      loadingIndicator.style.display = 'block';
-      try {
-        console.log("Loading model...");
-        model = await tf.loadLayersModel('model/model.json');
-        console.log("Model loaded.");
-      } catch (error) {
-        console.error("Failed to load model:", error);
-        alert("Could not load the model.");
-      } finally {
-        loadingIndicator.style.display = 'none';
-      }
-    }
-
-    function handleFileSelect(file) {
-      if (!file.type.match('image.*')) {
-        alert('Please select an image file.');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        imagePreview.src = e.target.result;
-        imagePreview.style.display = 'block';
-        uploadedImage = e.target.result;
-        analyzeBtn.disabled = false;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function analyzeImage() {
-      if (!uploadedImage || !model) {
-        alert("Please upload an image first.");
-        return;
-      }
-
-      loadingIndicator.style.display = 'block';
-      analyzeBtn.disabled = true;
-      resultContainer.style.display = 'none';
-
-      const img = new Image();
-      img.src = uploadedImage;
-
-      img.onload = async function () {
-        const tensor = tf.browser.fromPixels(img)
-          .resizeNearestNeighbor([224, 224]) // adjust as per your model's input
-          .toFloat()
-          .div(tf.scalar(255))
-          .expandDims();
-
-        const prediction = model.predict(tensor);
-        const data = await prediction.data();
-
-        const maxIndex = data.indexOf(Math.max(...data));
-        const confidence = (data[maxIndex] * 100).toFixed(2);
-
-        diseaseName.textContent = diseases[maxIndex] || "Unknown";
-        confidenceLevel.textContent = ⁠ Confidence: ${confidence}% ⁠;
-        resultContainer.style.display = 'block';
-
-        loadingIndicator.style.display = 'none';
-      };
-    }
-
-    window.addEventListener('DOMContentLoaded', loadModel);
-  </script>
+        // In a real implementation, you would load your TensorFlow model here
+        // For example:
+        /*
+        async function loadModel() {
+            const model = await tf.loadLayersModel('path/to/your/model.json');
+            return model;
+        }
+        
+        let model;
+        loadModel().then(loadedModel => {
+            model = loadedModel;
+            console.log('Model loaded successfully');
+        });
+        */
+    </script>
 </body>
 </html>
