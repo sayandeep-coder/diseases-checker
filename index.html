@@ -1,295 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skin Disease Classifier</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .upload-area {
-            border: 2px dashed #3498db;
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .upload-area:hover {
-            background-color: #f0f8ff;
-            border-color: #2980b9;
-        }
-        .upload-area.active {
-            border-color: #27ae60;
-            background-color: #e8f5e9;
-        }
-        #imagePreview {
-            max-width: 100%;
-            max-height: 300px;
-            margin: 20px auto;
-            display: none;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-            display: block;
-            margin: 20px auto;
-            width: 200px;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        button:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-        }
-        .result {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-            display: none;
-        }
-        .disease-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        .confidence {
-            font-size: 18px;
-            color: #7f8c8d;
-        }
-        .loading {
-            text-align: center;
-            margin: 20px 0;
-            display: none;
-        }
-        .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .new-analysis {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .new-analysis a {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .new-analysis a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Skin Disease Classifier</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .container {
+      background-color: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .upload-area {
+      border: 2px dashed #3498db;
+      border-radius: 8px;
+      padding: 30px;
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .upload-area:hover {
+      background-color: #f0f8ff;
+      border-color: #2980b9;
+    }
+    .upload-area.active {
+      border-color: #27ae60;
+      background-color: #e8f5e9;
+    }
+    #imagePreview {
+      max-width: 100%;
+      max-height: 300px;
+      margin: 20px auto;
+      display: none;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+      display: block;
+      margin: 20px auto;
+      width: 200px;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 5px;
+      background-color: #f8f9fa;
+      display: none;
+    }
+    .disease-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .confidence {
+      font-size: 18px;
+      color: #7f8c8d;
+    }
+    .loading {
+      text-align: center;
+      margin: 20px 0;
+      display: none;
+    }
+    .spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .new-analysis {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .new-analysis a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .new-analysis a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Skin Disease Classifier</h1>
-        
-        <div class="upload-area" id="uploadArea">
-            <p>Drag & drop an image of skin condition here or click to select</p>
-            <input type="file" id="fileInput" accept="image/*" style="display: none;">
-        </div>
-        
-        <img id="imagePreview" alt="Preview of uploaded image">
-        
-        <button id="analyzeBtn" disabled>Analyze Image</button>
-        
-        <div class="loading" id="loadingIndicator">
-            <div class="spinner"></div>
-            <p>Analyzing image...</p>
-        </div>
-        
-        <div class="result" id="resultContainer">
-            <div class="disease-name" id="diseaseName"></div>
-            <div class="confidence" id="confidenceLevel"></div>
-            <div class="new-analysis">
-                <a href="#" id="newAnalysisLink">Analyze another image</a>
-            </div>
-        </div>
+  <div class="container">
+    <h1>Skin Disease Classifier</h1>
+
+    <div class="upload-area" id="uploadArea">
+      <p>Drag & drop an image of skin condition here or click to select</p>
+      <input type="file" id="fileInput" accept="image/*" style="display: none;">
     </div>
 
-    <script>
-        // DOM elements
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const imagePreview = document.getElementById('imagePreview');
-        const analyzeBtn = document.getElementById('analyzeBtn');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const resultContainer = document.getElementById('resultContainer');
-        const diseaseName = document.getElementById('diseaseName');
-        const confidenceLevel = document.getElementById('confidenceLevel');
-        const newAnalysisLink = document.getElementById('newAnalysisLink');
+    <img id="imagePreview" alt="Preview of uploaded image">
 
-        // Model variables
-        let model;
-        let uploadedImage;
+    <button id="analyzeBtn" disabled>Analyze Image</button>
 
-        // Event listeners
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('active');
-        });
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('active');
-        });
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('active');
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                handleFileSelect(e.dataTransfer.files[0]);
-            }
-        });
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length) {
-                handleFileSelect(fileInput.files[0]);
-            }
-        });
-        analyzeBtn.addEventListener('click', analyzeImage);
-        newAnalysisLink.addEventListener('click', () => {
-            location.reload();
-        });
+    <div class="loading" id="loadingIndicator">
+      <div class="spinner"></div>
+      <p>Analyzing image...</p>
+    </div>
 
-        // Load the TensorFlow.js model
-        async function loadModel() {
-            loadingIndicator.style.display = 'block';
-            try {
-                // In a real app, you would load your trained model here
-                console.log("Loading model...");
-                
-                // Simulate model loading
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                // Mock model object - Replace this with your actual model loading code
-                model = {
-                    predict: function(img) {
-                        // This is where your actual model prediction would go
-                        // For demo purposes, we'll return random results
-                        const diseases = [
-                            "Eczema",
-                            "Melanoma",
-                            "Atopic Dermatitis",
-                            "Basal Cell Carcinoma",
-                            "Psoriasis",
-                            "Acne",
-                            "Rosacea",
-                            "Contact Dermatitis"
-                        ];
-                        
-                        // Generate random probabilities
-                        const probs = Array(diseases.length).fill(0).map(() => Math.random());
-                        const sum = probs.reduce((a, b) => a + b, 0);
-                        const probabilities = probs.map(p => p / sum);
-                        
-                        // Find the most probable disease
-                        const maxIndex = probabilities.indexOf(Math.max(...probabilities));
-                        
-                        return {
-                            disease: diseases[maxIndex],
-                            confidence: (probabilities[maxIndex] * 100).toFixed(2)
-                        };
-                    }
-                };
-                
-                console.log("Model loaded successfully");
-                loadingIndicator.style.display = 'none';
-            } catch (error) {
-                console.error("Error loading model:", error);
-                loadingIndicator.style.display = 'none';
-                alert("Failed to load the model. Please try again later.");
-            }
-        }
+    <div class="result" id="resultContainer">
+      <div class="disease-name" id="diseaseName"></div>
+      <div class="confidence" id="confidenceLevel"></div>
+      <div class="new-analysis">
+        <a href="#" id="newAnalysisLink">Analyze another image</a>
+      </div>
+    </div>
+  </div>
 
-        // Handle file selection
-        function handleFileSelect(file) {
-            if (!file.type.match('image.*')) {
-                alert('Please select an image file.');
-                return;
-            }
+  <script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const resultContainer = document.getElementById('resultContainer');
+    const diseaseName = document.getElementById('diseaseName');
+    const confidenceLevel = document.getElementById('confidenceLevel');
+    const newAnalysisLink = document.getElementById('newAnalysisLink');
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-                imagePreview.style.display = 'block';
-                uploadedImage = e.target.result;
-                analyzeBtn.disabled = false;
-            };
-            reader.readAsDataURL(file);
-        }
+    let model;
+    let uploadedImage;
 
-        // Analyze the uploaded image
-        async function analyzeImage() {
-            if (!uploadedImage || !model) {
-                alert("Please upload an image first.");
-                return;
-            }
+    const diseases = [
+      "Eczema", "Melanoma", "Atopic Dermatitis",
+      "Basal Cell Carcinoma", "Psoriasis",
+      "Acne", "Rosacea", "Contact Dermatitis"
+    ];
 
-            loadingIndicator.style.display = 'block';
-            analyzeBtn.disabled = true;
-            resultContainer.style.display = 'none';
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('active');
+    });
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('active');
+    });
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('active');
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFileSelect(e.dataTransfer.files[0]);
+      }
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        handleFileSelect(fileInput.files[0]);
+      }
+    });
+    analyzeBtn.addEventListener('click', analyzeImage);
+    newAnalysisLink.addEventListener('click', () => {
+      location.reload();
+    });
 
-            try {
-                // In a real app, you would preprocess the image and feed it to the model
-                // For this example, we'll use our mock model
-                const result = model.predict(uploadedImage);
-                
-                // Display results
-                diseaseName.textContent = result.disease;
-                confidenceLevel.textContent = ⁠ Confidence: ${result.confidence}% ⁠;
-                resultContainer.style.display = 'block';
-                
-                // Disable the analyze button after getting results
-                analyzeBtn.disabled = true;
-            } catch (error) {
-                console.error("Error analyzing image:", error);
-                alert("An error occurred while analyzing the image.");
-            } finally {
-                loadingIndicator.style.display = 'none';
-            }
-        }
+    async function loadModel() {
+      loadingIndicator.style.display = 'block';
+      try {
+        console.log("Loading model...");
+        model = await tf.loadLayersModel('model/model.json');
+        console.log("Model loaded.");
+      } catch (error) {
+        console.error("Failed to load model:", error);
+        alert("Could not load the model.");
+      } finally {
+        loadingIndicator.style.display = 'none';
+      }
+    }
 
-        // Initialize the app
-        window.addEventListener('DOMContentLoaded', () => {
-            loadModel();
-        });
-    </script>
+    function handleFileSelect(file) {
+      if (!file.type.match('image.*')) {
+        alert('Please select an image file.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imagePreview.src = e.target.result;
+        imagePreview.style.display = 'block';
+        uploadedImage = e.target.result;
+        analyzeBtn.disabled = false;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function analyzeImage() {
+      if (!uploadedImage || !model) {
+        alert("Please upload an image first.");
+        return;
+      }
+
+      loadingIndicator.style.display = 'block';
+      analyzeBtn.disabled = true;
+      resultContainer.style.display = 'none';
+
+      const img = new Image();
+      img.src = uploadedImage;
+
+      img.onload = async function () {
+        const tensor = tf.browser.fromPixels(img)
+          .resizeNearestNeighbor([224, 224]) // adjust as per your model's input
+          .toFloat()
+          .div(tf.scalar(255))
+          .expandDims();
+
+        const prediction = model.predict(tensor);
+        const data = await prediction.data();
+
+        const maxIndex = data.indexOf(Math.max(...data));
+        const confidence = (data[maxIndex] * 100).toFixed(2);
+
+        diseaseName.textContent = diseases[maxIndex] || "Unknown";
+        confidenceLevel.textContent = ⁠ Confidence: ${confidence}% ⁠;
+        resultContainer.style.display = 'block';
+
+        loadingIndicator.style.display = 'none';
+      };
+    }
+
+    window.addEventListener('DOMContentLoaded', loadModel);
+  </script>
 </body>
 </html>
